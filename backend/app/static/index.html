@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project Management MVP</title>
+    <style>
+      :root {
+        color: #032147;
+        background: #f7f8fb;
+        font-family: system-ui, sans-serif;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-items: center;
+      }
+
+      main {
+        width: min(32rem, calc(100% - 3rem));
+        padding: 2rem;
+        border-top: 0.4rem solid #ecad0a;
+        border-radius: 1rem;
+        background: white;
+        box-shadow: 0 1rem 2.5rem rgb(3 33 71 / 12%);
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      #api-message {
+        color: #753991;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Project Management MVP</h1>
+      <p>The static site is running.</p>
+      <p id="api-message" role="status">Contacting the API…</p>
+    </main>
+    <script>
+      const message = document.querySelector("#api-message");
+
+      fetch("/api/hello")
+        .then((response) => {
+          if (!response.ok) throw new Error("API request failed");
+          return response.json();
+        })
+        .then((data) => {
+          message.textContent = data.message;
+        })
+        .catch(() => {
+          message.textContent = "Unable to reach the API.";
+        });
+    </script>
+  </body>
+</html>

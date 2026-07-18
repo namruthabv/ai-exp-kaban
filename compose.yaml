@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - NPM_CONFIG_REGISTRY
+        - NPM_CONFIG_REPLACE_REGISTRY_HOST
+    ports:
+      - "8000:8000"

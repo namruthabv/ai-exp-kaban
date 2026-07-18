@@ -11,5 +11,14 @@ npm run dev
 
 ```bash
 npm run test:unit
+npm run lint
+npm run build
+```
+
+End-to-end tests run against the container-served production build:
+
+```bash
+../scripts/start-mac.sh
 npm run test:e2e
+../scripts/stop-mac.sh
 ```

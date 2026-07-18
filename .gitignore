@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+.idea/
+
 # C extensions
 *.so
 
@@ -174,3 +176,12 @@ cython_debug/
 
 .DS_Store
 
+# Project runtime and test artifacts
+*.db
+*.sqlite
+*.sqlite3
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/test-results/
+frontend/playwright-report/
