@@ -74,7 +74,7 @@
 - [x] Preserve the existing five-column Kanban behavior and color scheme.
 - [x] Keep backend/API paths from being shadowed by static routing.
 - [x] Update run and test documentation.
-- [ ] Mark Part 3 complete and request explicit approval for Part 4.
+- [x] Mark Part 3 complete and request explicit approval for Part 4.
 
 ### Tests
 
@@ -93,15 +93,15 @@
 
 ### Checklist
 
-- [ ] Add a minimal login page using the project color scheme.
-- [ ] Add backend login, logout, and current-session endpoints.
-- [ ] Validate only the hardcoded MVP credentials `user` / `password`.
-- [ ] Issue an HTTP-only, same-site session cookie with no persistent expiry; set `Secure` when appropriate for the environment.
-- [ ] Keep session signing secrets configurable and out of source control.
-- [ ] Require authentication for the board page and protected API routes.
-- [ ] Add logout behavior and redirect unauthenticated or expired sessions to login.
-- [ ] Ensure authentication errors are concise and do not reveal sensitive details.
-- [ ] Mark Part 4 complete and request explicit approval for Part 5.
+- [x] Add a minimal login page using the project color scheme.
+- [x] Add backend login, logout, and current-session endpoints.
+- [x] Validate only the hardcoded MVP credentials `user` / `password`.
+- [x] Issue an HTTP-only, same-site session cookie with no persistent expiry; set `Secure` when appropriate for the environment.
+- [x] Keep session signing secrets configurable and out of source control.
+- [x] Require authentication for the board page and protected API routes.
+- [x] Add logout behavior and redirect unauthenticated or expired sessions to login.
+- [x] Ensure authentication errors are concise and do not reveal sensitive details.
+- [x] Mark Part 4 complete and request explicit approval for Part 5.
 
 ### Tests
 

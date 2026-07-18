@@ -9,5 +9,7 @@ services:
         - no_proxy
         - NPM_CONFIG_REGISTRY
         - NPM_CONFIG_REPLACE_REGISTRY_HOST
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET:-}
     ports:
       - "8000:8000"
