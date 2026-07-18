@@ -20,8 +20,13 @@ instead.
 ```
 
 Open <http://localhost:8000>. Stop the app with the matching `stop-*` script.
+Sign in with username `user` and password `password`.
 
 The container builds the Next.js frontend as static files and serves them with the FastAPI API from the same origin.
+
+Set `SESSION_SECRET` in the root `.env` file to keep signed login sessions valid
+across container restarts. When it is omitted, the backend safely generates a
+temporary secret at startup for local use.
 
 ## Backend tests
 
