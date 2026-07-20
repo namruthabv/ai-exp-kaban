@@ -84,6 +84,7 @@ export const AuthenticatedApp = () => {
       username={user.username}
       logoutError={logoutError}
       onLogout={handleLogout}
+      onUnauthorized={() => setUser(null)}
     />
   );
 };

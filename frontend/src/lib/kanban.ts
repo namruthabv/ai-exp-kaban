@@ -11,11 +11,13 @@ export type Column = {
 };
 
 export type BoardData = {
+  id: string;
   columns: Column[];
   cards: Record<string, Card>;
 };
 
 export const initialData: BoardData = {
+  id: "board-demo",
   columns: [
     { id: "col-backlog", title: "Backlog", cardIds: ["card-1", "card-2"] },
     { id: "col-discovery", title: "Discovery", cardIds: ["card-3"] },
@@ -159,10 +161,4 @@ export const moveCard = (
     }
     return column;
   });
-};
-
-export const createId = (prefix: string) => {
-  const randomPart = Math.random().toString(36).slice(2, 8);
-  const timePart = Date.now().toString(36);
-  return `${prefix}-${randomPart}${timePart}`;
 };

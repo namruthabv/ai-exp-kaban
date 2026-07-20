@@ -7,7 +7,7 @@ export default defineConfig({
     timeout: 10_000,
   },
   use: {
-    baseURL: "http://127.0.0.1:8000",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:8000",
     trace: "retain-on-failure",
   },
   projects: [

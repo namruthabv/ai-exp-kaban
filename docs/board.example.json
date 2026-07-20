@@ -1,0 +1,47 @@
+{
+  "id": "board-example",
+  "columns": [
+    {
+      "id": "col-backlog",
+      "title": "Backlog",
+      "cardIds": ["card-1", "card-2"]
+    },
+    {
+      "id": "col-discovery",
+      "title": "Discovery",
+      "cardIds": []
+    },
+    {
+      "id": "col-progress",
+      "title": "In Progress",
+      "cardIds": ["card-3"]
+    },
+    {
+      "id": "col-review",
+      "title": "Review",
+      "cardIds": []
+    },
+    {
+      "id": "col-done",
+      "title": "Done",
+      "cardIds": []
+    }
+  ],
+  "cards": {
+    "card-1": {
+      "id": "card-1",
+      "title": "Align roadmap themes",
+      "details": "Draft quarterly themes with impact statements and metrics."
+    },
+    "card-2": {
+      "id": "card-2",
+      "title": "Gather customer signals",
+      "details": "Review support tags, sales notes, and churn feedback."
+    },
+    "card-3": {
+      "id": "card-3",
+      "title": "Design card layout",
+      "details": "Add hierarchy and spacing for scanning dense lists."
+    }
+  }
+}

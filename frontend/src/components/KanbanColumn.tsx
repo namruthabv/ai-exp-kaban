@@ -1,3 +1,4 @@
+import { useState } from "react";
 import clsx from "clsx";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -8,9 +9,18 @@ import { NewCardForm } from "@/components/NewCardForm";
 type KanbanColumnProps = {
   column: Column;
   cards: Card[];
-  onRename: (columnId: string, title: string) => void;
-  onAddCard: (columnId: string, title: string, details: string) => void;
-  onDeleteCard: (columnId: string, cardId: string) => void;
+  onRename: (columnId: string, title: string) => Promise<boolean>;
+  onAddCard: (
+    columnId: string,
+    title: string,
+    details: string
+  ) => Promise<boolean>;
+  onEditCard: (
+    cardId: string,
+    title: string,
+    details: string
+  ) => Promise<boolean>;
+  onDeleteCard: (cardId: string) => Promise<boolean>;
 };
 
 export const KanbanColumn = ({
@@ -18,9 +28,24 @@ export const KanbanColumn = ({
   cards,
   onRename,
   onAddCard,
+  onEditCard,
   onDeleteCard,
 }: KanbanColumnProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
+  const [draftTitle, setDraftTitle] = useState<string | null>(null);
+
+  const saveTitle = async () => {
+    if (draftTitle === null) {
+      return;
+    }
+    const trimmedTitle = draftTitle.trim();
+    if (!trimmedTitle || trimmedTitle === column.title) {
+      setDraftTitle(null);
+      return;
+    }
+    await onRename(column.id, trimmedTitle);
+    setDraftTitle(null);
+  };
 
   return (
     <section
@@ -39,12 +64,34 @@ export const KanbanColumn = ({
               {cards.length} cards
             </span>
           </div>
-          <input
-            value={column.title}
-            onChange={(event) => onRename(column.id, event.target.value)}
-            className="mt-3 w-full bg-transparent font-display text-lg font-semibold text-[var(--navy-dark)] outline-none"
-            aria-label="Column title"
-          />
+          {draftTitle === null ? (
+            <button
+              aria-label={`Edit ${column.title} column title`}
+              className="mt-3 w-full text-left font-display text-lg font-semibold text-[var(--navy-dark)]"
+              type="button"
+              onClick={() => setDraftTitle(column.title)}
+            >
+              {column.title}
+            </button>
+          ) : (
+            <input
+              autoFocus
+              value={draftTitle}
+              onChange={(event) => setDraftTitle(event.target.value)}
+              onBlur={() => void saveTitle()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.currentTarget.blur();
+                }
+                if (event.key === "Escape") {
+                  setDraftTitle(null);
+                }
+              }}
+              className="mt-3 w-full bg-transparent font-display text-lg font-semibold text-[var(--navy-dark)] outline-none"
+              aria-label="Column title"
+              maxLength={80}
+            />
+          )}
         </div>
       </div>
       <div className="mt-4 flex flex-1 flex-col gap-3">
@@ -53,7 +100,8 @@ export const KanbanColumn = ({
             <KanbanCard
               key={card.id}
               card={card}
-              onDelete={(cardId) => onDeleteCard(column.id, cardId)}
+              onEdit={onEditCard}
+              onDelete={onDeleteCard}
             />
           ))}
         </SortableContext>
@@ -64,7 +112,9 @@ export const KanbanColumn = ({
         )}
       </div>
       <NewCardForm
-        onAdd={(title, details) => onAddCard(column.id, title, details)}
+        onAdd={(cardTitle, details) =>
+          onAddCard(column.id, cardTitle, details)
+        }
       />
     </section>
   );

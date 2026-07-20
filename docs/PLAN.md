@@ -120,15 +120,15 @@
 
 ### Checklist
 
-- [ ] Inventory the frontend board fields and the operations required by UI and AI flows.
-- [ ] Compare a normalized relational model with a single JSON-document model for this MVP.
-- [ ] Propose the simplest SQLite schema that supports multiple users, one board per user, exactly five ordered columns, ordered cards, and future migrations.
-- [ ] Define IDs, ownership, ordering, constraints, timestamps if justified, and delete behavior.
-- [ ] Define the canonical API/AI board JSON shape and save an example JSON document under `docs/`.
-- [ ] Document initialization, transaction, migration, and container-local storage behavior.
-- [ ] Document how the hardcoded MVP user is seeded idempotently.
-- [ ] Do not implement the schema in this part.
-- [ ] Request explicit approval of the database design before Part 6.
+- [x] Inventory the frontend board fields and the operations required by UI and AI flows.
+- [x] Compare a normalized relational model with a single JSON-document model for this MVP.
+- [x] Propose the simplest SQLite schema that supports multiple users, one board per user, exactly five ordered columns, ordered cards, and future migrations.
+- [x] Define IDs, ownership, ordering, constraints, timestamps if justified, and delete behavior.
+- [x] Define the canonical API/AI board JSON shape and save an example JSON document under `docs/`.
+- [x] Document initialization, transaction, migration, and container-local storage behavior.
+- [x] Document how the hardcoded MVP user is seeded idempotently.
+- [x] Do not implement the schema in this part.
+- [x] Request explicit approval of the database design before Part 6.
 
 ### Tests and review
 
@@ -146,16 +146,16 @@
 
 ### Checklist
 
-- [ ] Implement the approved SQLite model with a small, explicit migration/initialization path.
-- [ ] Create the database and seed the MVP user and five-column board idempotently when absent.
-- [ ] Add authenticated routes to read the current user's board.
-- [ ] Add authenticated routes to rename columns and create, edit, delete, and move cards.
-- [ ] Preserve card order within and across columns using transactions.
-- [ ] Scope every query and mutation to the authenticated user.
-- [ ] Validate input with FastAPI/Pydantic request and response models.
-- [ ] Return predictable HTTP statuses and concise error bodies.
-- [ ] Add backend test fixtures using isolated temporary databases.
-- [ ] Mark Part 6 complete and request explicit approval for Part 7.
+- [x] Implement the approved SQLite model with a small, explicit migration/initialization path.
+- [x] Create the database and seed the MVP user and five-column board idempotently when absent.
+- [x] Add authenticated routes to read the current user's board.
+- [x] Add authenticated routes to rename columns and create, edit, delete, and move cards.
+- [x] Preserve card order within and across columns using transactions.
+- [x] Scope every query and mutation to the authenticated user.
+- [x] Validate input with FastAPI/Pydantic request and response models.
+- [x] Return predictable HTTP statuses and concise error bodies.
+- [x] Add backend test fixtures using isolated temporary databases.
+- [x] Mark Part 6 complete and request explicit approval for Part 7.
 
 ### Tests
 
@@ -176,15 +176,15 @@
 
 ### Checklist
 
-- [ ] Replace `initialData` runtime state with an authenticated board fetch.
-- [ ] Add a small typed API client and keep API transport separate from presentational components.
-- [ ] Connect rename, add, edit, delete, and drag/move actions to backend mutations.
-- [ ] Add the missing card-edit UI required by the business requirements.
-- [ ] Show focused loading and error states for initial load and mutations.
-- [ ] Keep the UI synchronized with server responses; avoid maintaining competing board representations.
-- [ ] Handle unauthorized responses by returning to login.
-- [ ] Preserve the existing visual design and five-column responsive layout.
-- [ ] Mark Part 7 complete and request explicit approval for Part 8.
+- [x] Replace `initialData` runtime state with an authenticated board fetch.
+- [x] Add a small typed API client and keep API transport separate from presentational components.
+- [x] Connect rename, add, edit, delete, and drag/move actions to backend mutations.
+- [x] Add the missing card-edit UI required by the business requirements.
+- [x] Show focused loading and error states for initial load and mutations.
+- [x] Keep the UI synchronized with server responses; avoid maintaining competing board representations.
+- [x] Handle unauthorized responses by returning to login.
+- [x] Preserve the existing visual design and five-column responsive layout.
+- [x] Mark Part 7 complete and request explicit approval for Part 8.
 
 ### Tests
 

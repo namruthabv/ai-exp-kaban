@@ -7,10 +7,10 @@ This file applies to everything under `frontend/`. Follow the repository-root `A
 ## Current application
 
 - Next.js 16 App Router application using React 19 and TypeScript.
-- The only route is `src/app/page.tsx`, which renders `KanbanBoard`.
-- The board is currently a client-only demo. State starts from `initialData` and is lost on refresh.
+- The only route is `src/app/page.tsx`, which renders the authenticated application.
+- The board loads from the authenticated FastAPI API and replaces its state with the canonical board returned after every mutation.
 - The MVP board has exactly five columns. Users may rename them but must not add or remove columns.
-- Cards can currently be added, removed, reordered, and moved between columns. The required card-edit flow has not been implemented yet.
+- Cards can be added, edited, removed, reordered, and moved between columns, with every operation persisted to SQLite.
 - Drag-and-drop uses `@dnd-kit/core` and `@dnd-kit/sortable`.
 - Styling uses Tailwind CSS 4 utilities plus project color variables in `src/app/globals.css`.
 - Production uses a self-contained static export and system font stacks, so builds do not fetch fonts from external services.
@@ -18,12 +18,13 @@ This file applies to everything under `frontend/`. Follow the repository-root `A
 ## Structure and data flow
 
 - `src/app/`: route, metadata, fonts, and global styles.
-- `src/components/KanbanBoard.tsx`: owns the current in-memory board state and coordinates mutations and drag events.
+- `src/components/KanbanBoard.tsx`: loads the canonical board, coordinates persisted mutations and drag events, and displays focused request states.
 - `src/components/KanbanColumn.tsx`: renders a droppable column, its title, cards, and add-card form.
 - `src/components/KanbanCard.tsx`: renders a sortable card and remove action.
 - `src/components/KanbanCardPreview.tsx`: drag overlay presentation.
 - `src/components/NewCardForm.tsx`: local form state for creating cards.
-- `src/lib/kanban.ts`: board types, sample data, ID creation, and pure card-movement logic.
+- `src/lib/api.ts`: typed same-origin board API boundary.
+- `src/lib/kanban.ts`: board types, sample test data, and pure card-movement logic.
 - `src/test/`: Vitest setup and declarations.
 - `tests/`: Playwright browser tests.
 

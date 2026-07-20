@@ -39,36 +39,65 @@ test("loads the kanban board", async ({ page }) => {
   await expect(page.locator('[data-testid^="column-"]')).toHaveCount(5);
 });
 
-test("adds a card to a column", async ({ page }) => {
+test("persists board changes after refresh", async ({ page }) => {
   await signIn(page);
   const firstColumn = page.locator('[data-testid^="column-"]').first();
+  const renamedColumn = `Ideas ${Date.now()}`;
+  await firstColumn.getByRole("button", { name: /edit .* column title/i }).click();
+  await firstColumn.getByLabel("Column title").fill(renamedColumn);
+  await firstColumn.getByLabel("Column title").press("Enter");
+  await expect(firstColumn.getByText(renamedColumn)).toBeVisible();
+
   await firstColumn.getByRole("button", { name: /add a card/i }).click();
-  await firstColumn.getByPlaceholder("Card title").fill("Playwright card");
+  const originalTitle = `Playwright card ${Date.now()}`;
+  const editedTitle = `${originalTitle} edited`;
+  await firstColumn.getByPlaceholder("Card title").fill(originalTitle);
   await firstColumn.getByPlaceholder("Details").fill("Added via e2e.");
   await firstColumn.getByRole("button", { name: /add card/i }).click();
-  await expect(firstColumn.getByText("Playwright card")).toBeVisible();
-});
+  await expect(firstColumn.getByText(originalTitle)).toBeVisible();
 
-test("moves a card between columns", async ({ page }) => {
-  await signIn(page);
-  const card = page.getByTestId("card-card-1");
-  const targetColumn = page.getByTestId("column-col-review");
-  const cardBox = await card.boundingBox();
-  const columnBox = await targetColumn.boundingBox();
-  if (!cardBox || !columnBox) {
+  await firstColumn.getByRole("button", { name: `Edit ${originalTitle}` }).click();
+  await firstColumn.getByLabel("Card title").fill(editedTitle);
+  await firstColumn.getByLabel("Card details").fill("Edited via e2e.");
+  await firstColumn.getByRole("button", { name: "Save" }).click();
+  await expect(firstColumn.getByText(editedTitle)).toBeVisible();
+
+  const card = firstColumn.locator("article").filter({ hasText: editedTitle });
+  const dragHandle = card.getByRole("button", { name: `Move ${editedTitle}` });
+  const targetColumn = page.locator('[data-testid^="column-"]').nth(4);
+  const dropArea = targetColumn;
+  const handleBox = await dragHandle.boundingBox();
+  const dropBox = await dropArea.boundingBox();
+  if (!handleBox || !dropBox) {
     throw new Error("Unable to resolve drag coordinates.");
   }
-
   await page.mouse.move(
-    cardBox.x + cardBox.width / 2,
-    cardBox.y + cardBox.height / 2
+    handleBox.x + handleBox.width / 2,
+    handleBox.y + handleBox.height / 2
   );
   await page.mouse.down();
   await page.mouse.move(
-    columnBox.x + columnBox.width / 2,
-    columnBox.y + 120,
+    dropBox.x + dropBox.width - 12,
+    dropBox.y + dropBox.height / 2,
     { steps: 12 }
   );
   await page.mouse.up();
-  await expect(targetColumn.getByTestId("card-card-1")).toBeVisible();
+  await expect(targetColumn.getByText(editedTitle)).toBeVisible();
+
+  await page.reload();
+  await expect(
+    firstColumn.getByRole("button", {
+      name: `Edit ${renamedColumn} column title`,
+    })
+  ).toBeVisible();
+  await expect(
+    page.locator('[data-testid^="column-"]').nth(4).getByText(editedTitle)
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: `Delete ${editedTitle}` })
+    .click();
+  await expect(page.getByText(editedTitle)).toBeHidden();
+  await page.reload();
+  await expect(page.getByText(editedTitle)).toBeHidden();
 });

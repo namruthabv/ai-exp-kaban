@@ -10,6 +10,7 @@ services:
         - NPM_CONFIG_REGISTRY
         - NPM_CONFIG_REPLACE_REGISTRY_HOST
     environment:
+      DATABASE_PATH: ${DATABASE_PATH:-/app/data/app.db}
       SESSION_SECRET: ${SESSION_SECRET:-}
     ports:
       - "8000:8000"
