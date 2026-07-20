@@ -177,5 +177,6 @@ it is not stored in SQLite.
 - Database constraints allow no sixth column, duplicate column position,
   duplicate card position, or orphan board/column/card row.
 
-Part 5 defines this design only. Schema creation and persistence code begin
-only after explicit approval for Part 6.
+This design was approved in Part 5 and implemented in Part 6. Part 7 connects
+the frontend to the persisted API and treats its canonical board response as
+the authoritative UI state.

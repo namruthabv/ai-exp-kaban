@@ -11,6 +11,92 @@
 - Never expose `OPENROUTER_API_KEY` to the browser, logs, committed files, or Docker image layers.
 - Prefer small, idiomatic modules and add tests with each behavior rather than deferring testing.
 
+## Current status
+
+- Parts 1-7 are implemented and explicitly approved by the user.
+- Part 8 has not started and requires explicit approval before implementation.
+- The approved Parts 6-7 implementation is committed on `main`.
+
+## Implemented design decisions
+
+### Runtime and deployment
+
+- FastAPI serves both `/api/*` and the statically exported Next.js application
+  from one origin; there is no production Next.js server or CORS layer.
+- The production image uses a Node build stage and a pinned `uv` Python runtime
+  stage. Frontend lint, unit tests, and the static build run during the image
+  build.
+- Docker Compose remains compatible with Docker Engine, Rancher Desktop,
+  Colima, and Docker Desktop. The macOS start script uses the native platform
+  and excludes inherited proxy variables by default; `--use-proxy` opts back
+  into the terminal's proxy settings.
+- SQLite defaults to `/app/data/app.db` and can be changed with
+  `DATABASE_PATH`. It remains in the container writable layer with no mounted
+  volume, so it survives logout, page reload, and normal use of the same
+  container, but not container recreation.
+
+### Authentication
+
+- Authentication intentionally accepts only the MVP credentials `user` /
+  `password`; the password is not stored in SQLite. The normalized database
+  still supports additional users when a future authentication flow is added.
+- The session is an HTTP-only, SameSite=Lax, HMAC-signed cookie without a
+  persistent expiry. It is Secure on HTTPS and is deleted on logout.
+- `SESSION_SECRET` keeps sessions valid across application restarts. When it is
+  absent, the backend creates an ephemeral signing secret for that process.
+
+### Database and board API
+
+- The approved normalized schema and rationale live in
+  [`DATABASE_SCHEMA.md`](./DATABASE_SCHEMA.md); the canonical response example
+  lives in [`board.example.json`](./board.example.json).
+- The backend uses Python's standard `sqlite3` module rather than an ORM. A
+  FastAPI lifespan hook creates the directory, applies ordered migrations using
+  `PRAGMA user_version`, and seeds a user and board only when absent.
+- Server-generated UUID-based text IDs are opaque. Seed IDs are also generated
+  per board so multiple users cannot collide.
+- All writes use `BEGIN IMMEDIATE`, verify ownership through the authenticated
+  username, maintain dense card positions, and roll back on failure.
+- Board routes are:
+  - `GET /api/board`
+  - `PATCH /api/board/columns/{column_id}`
+  - `POST /api/board/cards`
+  - `PATCH /api/board/cards/{card_id}`
+  - `DELETE /api/board/cards/{card_id}`
+  - `POST /api/board/cards/{card_id}/move`
+- Every successful mutation returns the complete canonical board. Card creation
+  returns `201`; authentication, missing ownership-scoped resources, and
+  invalid input use concise `401`, `404`, and `422` responses respectively.
+
+### Frontend state synchronization
+
+- A small typed same-origin API client is the only board transport boundary.
+  Runtime board data is fetched after authentication; `initialData` is no
+  longer displayed as application state.
+- The UI does not optimistically maintain a competing board. After every
+  successful mutation, it replaces board state with the canonical server
+  response; failures retain the last persisted board and show a focused error.
+- Column and card forms keep only temporary draft input. Column rename saves on
+  blur or Enter; failed creates or edits preserve useful form context.
+- A `401` from the board API returns the user to sign-in. Initial loading,
+  retryable load failures, mutation progress, and mutation failures have
+  explicit UI states.
+- Cards use a dedicated drag handle with pointer and keyboard sensors. Drag
+  results are converted to an authoritative target column and zero-based
+  position before calling the move API.
+
+### Verification through Part 7
+
+- Backend: 8 focused tests passed against isolated temporary SQLite databases.
+- Frontend: lint passed; 9 API, pure-logic, and component tests passed.
+- Production static build and TypeScript validation passed.
+- Browser integration: 3 Playwright tests passed against the production static
+  export served by FastAPI, including login and persisted rename, create, edit,
+  drag/move, delete, logout/login, and page reload behavior.
+- The running Compose image was subsequently verified to expose the new
+  authenticated board API. A controlled move, logout, login, read, and restore
+  cycle proved that state persists across logout/login in the same container.
+
 ## Part 1: Plan
 
 ### Checklist
@@ -106,8 +192,7 @@
 ### Tests
 
 - Backend tests cover valid login, invalid credentials, missing/invalid session, current user, logout, and protected endpoint access.
-- Frontend tests cover form validation, failed login feedback, authenticated board display, and logout.
-- Playwright tests cover first visit redirect/login requirement, successful login, refresh while logged in, failed login, and logout.
+- Playwright tests cover form validation, failed login feedback, authenticated board display, session refresh, and logout.
 - Inspect response headers to verify cookie security attributes and absence of credentials in responses.
 
 ### Success criteria
@@ -188,11 +273,12 @@
 
 ### Tests
 
-- API-client unit tests cover request shape, response parsing, and errors.
-- Component tests mock the API and cover load, rename, add, edit, delete, move, loading, mutation failure, and unauthorized state.
+- API-client unit tests cover move request shape, canonical response parsing, and error mapping.
+- Pure board tests cover same-column reorder, cross-column move, and dropping at a column end.
+- Component tests mock the API and cover load, rename, add, edit, delete, load failure, mutation failure, and unauthorized state.
 - Backend/frontend integration tests verify mutations persist after page refresh.
 - Playwright tests cover login followed by every board operation, including drag-and-drop and card editing.
-- Run lint, frontend unit tests, backend tests, static build, and container-based browser tests.
+- Run lint, frontend unit tests, backend tests, the static build, and Playwright against the production export served by FastAPI; verify the resulting Compose image and API separately.
 
 ### Success criteria
 
